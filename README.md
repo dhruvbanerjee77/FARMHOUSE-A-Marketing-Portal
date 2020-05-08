@@ -2,6 +2,8 @@
 
 Task: To create a farmer friendly app for ease of communication for dealings and purchasing.
 
+
+
 Parts of the app:
 1. MAIN SCREEN:
     First screen when the app opens. Asks to direct user to repective pages depending on if the user is a farmer or a buyer. Contains log In/signup option.
