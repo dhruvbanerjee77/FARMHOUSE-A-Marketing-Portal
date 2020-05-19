@@ -26,6 +26,7 @@ struct farmer_details main_farmer;
 struct buyer_details main_buyer;
 void create_farmer_details();
 void create_buyer_details();
+void display_current();
 void temp();
 void SignIn();
 void SignUp();
@@ -51,6 +52,9 @@ int main()
             break;
 
             case 3: temp();
+            break;
+
+            case 4: display_current();
             break;
 
             case 0: break;
@@ -125,9 +129,33 @@ void SignIn()
             break;
         }
     }
-    printf("Name: %s \n",acc.name);
-    printf("Phone number: %ld \n",acc.phno);
-    printf("Residence: %s \n", acc.residence);
+    fclose(fp);
+    main_acc = acc;
+    if(main_acc.option == 0)
+    {
+        fp = fopen("farmer_details.dat","rb");
+        while(fread(&main_farmer, sizeof(main_farmer),1,fp)==1)
+            {
+                if(!strcmp(main_farmer.name,check_name))
+                {
+                    break;
+                }
+            }
+            fclose(fp);
+    }
+    else
+    {
+        fp = fopen("buyer_details.dat","rb");
+        while(fread(&main_buyer, sizeof(main_buyer),1,fp)==1)
+            {
+                if(!strcmp(main_buyer.name,check_name))
+                {
+                    break;
+                }
+            }
+            fclose(fp);
+    }
+
 }
 
 void create_farmer_details()
@@ -152,6 +180,24 @@ void create_buyer_details()
     fp = fopen("buyer_details.dat","ab");
     fwrite(&main_buyer,sizeof(main_buyer),1,fp);
     fclose(fp);
+}
+
+void display_current()
+{
+    printf("Name: %s \n",main_acc.name);
+    printf("Phone number: %ld \n",main_acc.phno);
+    printf("Residence: %s \n", main_acc.residence);
+    if(main_acc.option == 0)
+    {
+        printf("FARMER DETAILS \n");
+        printf("Crop: %s \n", main_farmer.crop);
+        printf("Residence: %s \n", main_farmer.residence);
+    }
+    if(main_acc.option==1)
+    {
+        printf("BUYER DETAILS \n");
+        printf("Name: %s \n",main_buyer.name);
+    }
 }
 
 void temp()
