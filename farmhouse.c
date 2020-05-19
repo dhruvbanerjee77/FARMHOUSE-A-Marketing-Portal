@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include <stdlib.h>
 
 struct basic_details
 {
@@ -23,6 +24,17 @@ struct buyer_details
     char userID[20];
     char name[20];
     char residence[20];
+    int no_of_quotes;
+};
+
+struct buyer_quotes
+{
+    int valid;
+    char userID[20];
+    int quote_no;
+    char crop[20];
+    float price;
+    char residence[20];
 };
 
 struct basic_details main_acc;
@@ -33,6 +45,9 @@ void create_buyer_details();
 void display_current();
 void farmer_portal();
 void buyer_portal();
+void add_quote();
+void remove_quote();
+void all_quotes();
 int check_valid_userID(char check[20]);
 void temp();
 void SignIn();
@@ -263,6 +278,7 @@ void create_buyer_details()
 {
     strcpy(main_buyer.name, main_acc.name);
     strcpy(main_buyer.residence,main_acc.residence);
+    main_buyer.no_of_quotes=0;
     FILE *fp;
     fp = fopen("buyer_details.dat","ab");
     fwrite(&main_buyer,sizeof(main_buyer),1,fp);
@@ -332,8 +348,142 @@ void farmer_portal()
 
 void buyer_portal()
 {
+    int selection;
+    while(selection!=5)
+    {
+        system("cls");
+        printf("BUYER PORTAL \n");
+        printf("Select Option: \n");
+        printf("1. Add quote \n");
+        printf("2. Remove Quote \n");
+        printf("3. Quote history \n");
+        printf("4. Statistics \n");
+        printf("5. Back");
+        scanf("%d",&selection);
+        switch(selection)
+        {
+            case 1: add_quote();
+            break;
+
+            case 2: remove_quote();
+            break;
+
+            case 3: all_quotes();
+            break;
+
+            default: printf("Enter Valid Option. \nPress any key to continue...");
+            getch();
+        }
+    }
+
+}
+
+void add_quote()
+{
+    main_buyer.no_of_quotes++;
+    struct buyer_quotes quote;
+    quote.quote_no=main_buyer.no_of_quotes;
     system("cls");
-    printf("BUYER PORTAL \n");
+    printf("Enter Crop: ");
+    scanf("%s", quote.crop);
+    printf("Quote: ");
+    scanf("%f",&quote.price);
+    quote.valid=1;
+    strcpy(quote.userID,main_acc.userID);
+    strcpy(quote.residence,main_acc.residence);
+    FILE *fp;
+    fp = fopen("quotes.dat","ab");
+    fwrite(&quote,sizeof(quote),1,fp);
+    fclose(fp);
+
+    printf("Quote Added \nPress any key to continue...");
+
+    struct buyer_details acc;
+    fp = fopen("buyer_details.dat","rb");
+    FILE *fp2;
+    fp2 = fopen("temp.dat","wb");
+    while(fread(&acc,sizeof(acc),1,fp))
+    {
+        if(!strcmp(acc.userID,main_buyer.userID))
+        {
+            fwrite(&main_buyer,sizeof(main_buyer),1,fp2);
+        }
+        else
+        {
+            fwrite(&acc,sizeof(acc),1,fp2);
+        }
+    }
+    fclose(fp);
+    fclose(fp2);
+
+    remove("buyer_details.dat");
+    rename("temp.dat","buyer_details.dat");
+    getch();
+}
+
+void remove_quote()
+{
+    system("cls");
+    printf("List of all quotes: \n");
+    FILE *fp;
+    fp = fopen("quotes.dat","rb");
+
+    struct buyer_quotes quote;
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        printf("Quote number: %d \n",quote.quote_no);
+        if(quote.valid)
+        {
+            printf("\t Crop: %s \n",quote.crop);
+            printf("\t Quote: %f \n",quote.price);
+            printf("\n");
+        }
+    }
+    fclose(fp);
+    printf("Enter Quote number of quote to be deleted: ");
+    int input;
+    scanf("%d",&input);
+    FILE *fp2;
+    fp2=fopen("temp.dat","wb");
+    fp = fopen("quotes.dat","rb");
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(!strcmp(main_acc.userID,quote.userID) && quote.quote_no==input)
+        {
+            quote.valid = 0;
+            fwrite(&quote,sizeof(quote),1,fp2);
+        }
+        else
+        {
+            fwrite(&quote,sizeof(quote),1,fp2);
+        }
+
+    }
+    fclose(fp2);
+    fclose(fp);
+
+
+    remove("quotes.dat");
+    rename("temp.dat","quotes.dat");
+}
+
+void all_quotes()
+{
+    system("cls");
+    printf("ALL QUOTES: \n");
+    FILE *fp;
+    fp = fopen("quotes.dat","rb");
+    struct buyer_quotes quote;
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(!strcmp(quote.userID, main_acc.userID))
+        {
+            printf("Quote ID: %d\n", quote.quote_no);
+            printf("Crop: %s\n",quote.crop);
+            printf("Quote: %f\n",quote.price);
+            printf("Is valid: %d\n\n",quote.valid);
+        }
+    }
     getch();
 }
 
