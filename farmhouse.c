@@ -31,6 +31,8 @@ struct buyer_details main_buyer;
 void create_farmer_details();
 void create_buyer_details();
 void display_current();
+void farmer_portal();
+void buyer_portal();
 int check_valid_userID(char check[20]);
 void temp();
 void SignIn();
@@ -40,8 +42,17 @@ void SignUp();
 int main()
 {
     int selection=1;
+    main_acc.option = -1;
     while(selection)
     {
+        if(main_acc.option==0)
+        {
+            farmer_portal();
+        }
+        if(main_acc.option==1)
+        {
+            buyer_portal();
+        }
         system("cls");
         printf("Enter option: \n");
         printf("0. Exit \n");
@@ -293,6 +304,37 @@ int check_valid_userID(char check[20])
         }
     }
     return valid;
+}
+
+void farmer_portal()
+{
+    int selection;
+    while(selection!=7)
+    {
+        system("cls");
+        printf("FARMER PORTAL \n");
+        printf("Select Option: \n");
+        printf("1. Find best buyer based on price \n");
+        printf("2. Find nearest local buyer \n");
+        printf("3. Search buyer by userID \n");
+        printf("4. Show all buyers \n");
+        printf("5. Statistics \n");
+        printf("6. Change my details \n");
+        printf("7. Back");
+        scanf("%d", &selection);
+        switch(selection)
+        {
+            default: printf("Enter Valid Option. \nPress any key to continue...");
+            getch();
+        }
+    }
+}
+
+void buyer_portal()
+{
+    system("cls");
+    printf("BUYER PORTAL \n");
+    getch();
 }
 
 void temp()
