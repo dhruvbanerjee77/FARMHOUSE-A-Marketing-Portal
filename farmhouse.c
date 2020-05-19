@@ -369,7 +369,7 @@ void find_by_price()
     int price = 0;
     FILE *fp;
     fp = fopen("quotes.dat","rb");
-    buyer_quotes quote;
+    struct buyer_quotes quote;
 
     system("cls");
     printf("Enter Crop: ");
@@ -414,7 +414,7 @@ void display_buyer(struct buyer_quotes quotes)
         {
             printf("NAME: %s \n",acc.name);
             printf("Phone number: %ld \n",acc.password);
-            printf("Residence Area: %ld \n",acc.residence);
+            printf("Residence Area: %s \n",acc.residence);
             printf("Quote number: %d \n",quotes.quote_no);
             printf("Crop: %s \n",quotes.crop);
             printf("Quote: %f \n",quotes.price);
@@ -445,7 +445,7 @@ void find_by_location()
     {
         if(!strcmp(quote.crop,input2) && !strcmp(quote.residence,input))
         {
-            display(quote);
+            display_buyer(quote);
         }
     }
     getch();
@@ -457,7 +457,7 @@ void search_buyer()
     printf("Enter USERID: ");
     char input[20];
     scanf("%s",input);
-    File *fp;
+    FILE *fp;
     struct basic_details acc;
     fp = fopen("acc.dat","rb");
     while(fread(&acc,sizeof(acc),1,fp))
@@ -476,7 +476,7 @@ void search_buyer()
 void show_all_buyers()
 {
     system("cls");
-    printf("ALL QUOTES AND BUYERS \n")
+    printf("ALL QUOTES AND BUYERS \n");
     FILE *fp;
     struct buyer_quotes quote;
     fp = fopen("quotes.dat","rb");
