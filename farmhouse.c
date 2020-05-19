@@ -2,6 +2,8 @@
 
 struct basic_details
 {
+    char userID[20];
+    char password[20];
     char name[20];
     long int phno;
     char residence[20];
@@ -10,6 +12,7 @@ struct basic_details
 
 struct farmer_details
 {
+    char userID[20];
     char name[20];
     char crop[20];
     char residence[20];
@@ -17,6 +20,7 @@ struct farmer_details
 
 struct buyer_details
 {
+    char userID[20];
     char name[20];
     char residence[20];
 };
@@ -27,6 +31,7 @@ struct buyer_details main_buyer;
 void create_farmer_details();
 void create_buyer_details();
 void display_current();
+int check_valid_userID(char check[20]);
 void temp();
 void SignIn();
 void SignUp();
@@ -100,6 +105,44 @@ void SignUp()
     printf("Enter area of residence: ");
     scanf("%s", acc.residence);
 
+    while(1)
+    {
+        system("cls");
+        printf("Enter USER-ID: ");
+        char input[20];
+        scanf("%s",input);
+        if(check_valid_userID(input))
+        {
+           strcpy(acc.userID,input);
+           char input2[20],ch;
+           int i =0;
+           printf("\n");
+           printf("Enter Password: ");
+           while(1)
+           {
+               ch = getch();
+               if(ch == '\r')
+               {
+                   break;
+               }
+               else
+               {
+                   input2[i] = ch;
+                   i++;
+                   printf("*");
+               }
+           }
+           input2[i] = '\0';
+           strcpy(acc.password,input2);
+           break;
+        }
+        else
+        {
+           printf("User ID already Exists. Try another ID. \nPress any key to continue...");
+           getch();
+        }
+    }
+
     fwrite(&acc,sizeof(acc),1,fp);
     fclose(fp);
 
@@ -117,45 +160,78 @@ void SignUp()
 
 void SignIn()
 {
-    FILE *fp;
-    fp = fopen("acc.dat","rb");
-    struct basic_details acc;
-    char check_name[20];
-    scanf("%s",check_name);
-    while(fread(&acc, sizeof(acc),1,fp)==1)
+    int tries = 1;
+    while(tries!=3)
     {
-        if(!strcmp(acc.name,check_name))
+        FILE *fp;
+        fp = fopen("acc.dat","rb");
+        struct basic_details acc;
+        char input1[20];
+        system("cls");
+        printf("Enter USER ID: ");
+        scanf("%s",input1);
+        printf("Enter Password: ");
+        char input2[20], ch;
+        int i = 0;
+        while(1)
         {
+            ch = getch();
+            if(ch == '\r')
+            {
+                input2[i] = '\0';
+                break;
+            }
+            else
+            {
+                input2[i] = ch;
+                i++;
+                printf("*");
+            }
+        }
+        int validated = 0;
+        while(fread(&acc, sizeof(acc),1,fp)==1)
+        {
+            if(!strcmp(acc.userID,input1) && !strcmp(acc.password,input2))
+            {
+                validated = 1;
+                break;
+            }
+        }
+        fclose(fp);
+        if(validated)
+        {
+            main_acc = acc;
+            if(main_acc.option == 0)
+            {
+                fp = fopen("farmer_details.dat","rb");
+                while(fread(&main_farmer, sizeof(main_farmer),1,fp)==1)
+                    {
+                        if(!strcmp(main_farmer.userID,input1))
+                        {
+                            break;
+                        }
+                    }
+            }
+            else
+            {
+                fp = fopen("buyer_details.dat","rb");
+                while(fread(&main_buyer, sizeof(main_buyer),1,fp)==1)
+                    {
+                        if(!strcmp(main_buyer.userID,input1))
+                        {
+                            break;
+                        }
+                    }
+            }
             break;
         }
+        else
+        {
+            printf("INVALID ID or PASSWORD. Try Again. \nPress any key to continue...");
+            getch();
+            tries++;
+        }
     }
-    fclose(fp);
-    main_acc = acc;
-    if(main_acc.option == 0)
-    {
-        fp = fopen("farmer_details.dat","rb");
-        while(fread(&main_farmer, sizeof(main_farmer),1,fp)==1)
-            {
-                if(!strcmp(main_farmer.name,check_name))
-                {
-                    break;
-                }
-            }
-            fclose(fp);
-    }
-    else
-    {
-        fp = fopen("buyer_details.dat","rb");
-        while(fread(&main_buyer, sizeof(main_buyer),1,fp)==1)
-            {
-                if(!strcmp(main_buyer.name,check_name))
-                {
-                    break;
-                }
-            }
-            fclose(fp);
-    }
-
 }
 
 void create_farmer_details()
@@ -187,6 +263,8 @@ void display_current()
     printf("Name: %s \n",main_acc.name);
     printf("Phone number: %ld \n",main_acc.phno);
     printf("Residence: %s \n", main_acc.residence);
+    printf("USER ID: %s \n",main_acc.userID);
+    printf("Password: %s \n",main_acc.password);
     if(main_acc.option == 0)
     {
         printf("FARMER DETAILS \n");
@@ -198,6 +276,23 @@ void display_current()
         printf("BUYER DETAILS \n");
         printf("Name: %s \n",main_buyer.name);
     }
+}
+
+int check_valid_userID(char check[20])
+{
+    struct basic_details acc;
+    FILE *fp;
+    fp = fopen("acc.dat","rb");
+    int valid = 1;
+    while(fread(&acc,sizeof(acc),1,fp))
+    {
+        if(!strcmp(check,acc.userID))
+        {
+            valid = 0;
+            break;
+        }
+    }
+    return valid;
 }
 
 void temp()
@@ -214,6 +309,8 @@ void temp()
         printf("Name: %s \n",acc1.name);
         printf("Phone number: %ld \n",acc1.phno);
         printf("Residence: %s \n", acc1.residence);
+        printf("USER ID: %s\n",acc1.userID);
+        printf("Password: %s \n",acc1.password);
         if(acc1.option == 0)
         {
             printf("Type: Farmer \n");
