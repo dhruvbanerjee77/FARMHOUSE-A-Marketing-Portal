@@ -44,11 +44,16 @@ void create_farmer_details();
 void create_buyer_details();
 void display_current();
 void farmer_portal();
+void search_buyer();
 void buyer_portal();
+void find_by_location();
 void add_quote();
+void display_buyer( struct buyer_quotes quotes);
 void remove_quote();
+void show_all_buyers();
 void all_quotes();
 int check_valid_userID(char check[20]);
+void find_by_price();
 void temp();
 void SignIn();
 void SignUp();
@@ -333,17 +338,156 @@ void farmer_portal()
         printf("1. Find best buyer based on price \n");
         printf("2. Find nearest local buyer \n");
         printf("3. Search buyer by userID \n");
-        printf("4. Show all buyers \n");
+        printf("4. Show all quotes \n");
         printf("5. Statistics \n");
         printf("6. Change my details \n");
         printf("7. Back");
         scanf("%d", &selection);
         switch(selection)
         {
+            case 1: find_by_price();
+            break;
+
+            case 2: find_by_location();
+            break;
+
+            case 3: search_buyer();
+            break;
+
+            case 4: show_all_buyers();
+            break;
+
+
             default: printf("Enter Valid Option. \nPress any key to continue...");
             getch();
         }
     }
+}
+
+void find_by_price()
+{
+    int price = 0;
+    FILE *fp;
+    fp = fopen("quotes.dat","rb");
+    buyer_quotes quote;
+
+    system("cls");
+    printf("Enter Crop: ");
+
+    char input[20];
+    scanf("%s",input);
+
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(quote.price>=price && quote.valid && !strcmp(quote.crop,input))
+        {
+            price = quote.price;
+        }
+    }
+    fseek(fp,0,SEEK_SET);
+
+
+    system("cls");
+    printf("BEST BUYER(S) BASED ON QUOTES: \n");
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(quote.price==price && quote.valid && !strcmp(quote.crop,input))
+        {
+            display_buyer(quote);
+        }
+    }
+    printf("Press any key to continue...");
+    getch();
+    fclose(fp);
+}
+
+void display_buyer(struct buyer_quotes quotes)
+{
+    FILE *fp_buyer, *fp_main;
+    fp_main = fopen("acc.dat","rb");
+    fp_buyer = fopen("buyer_details.dat","rb");
+    struct basic_details acc;
+
+    while(fread(&acc,sizeof(acc),1,fp_main))
+    {
+        if(!strcmp(acc.userID,quotes.userID))
+        {
+            printf("NAME: %s \n",acc.name);
+            printf("Phone number: %ld \n",acc.password);
+            printf("Residence Area: %ld \n",acc.residence);
+            printf("Quote number: %d \n",quotes.quote_no);
+            printf("Crop: %s \n",quotes.crop);
+            printf("Quote: %f \n",quotes.price);
+            printf("\n \n");
+        }
+    }
+    fclose(fp_main);
+    fclose(fp_buyer);
+}
+
+void find_by_location()
+{
+    FILE *fp;
+    fp = fopen("quotes.dat","rb");
+    system("cls");
+    printf("Enter Residence region: ");
+    char input[20];
+    scanf("%s",input);
+
+    printf("Enter Crop: ");
+    char input2[20];
+    scanf("%s",input2);
+
+    struct buyer_quotes quote;
+    system("cls");
+    printf("BEST BUYER BASED ON SEARCH RESULTS: ");
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(!strcmp(quote.crop,input2) && !strcmp(quote.residence,input))
+        {
+            display(quote);
+        }
+    }
+    getch();
+}
+
+void search_buyer()
+{
+    system("cls");
+    printf("Enter USERID: ");
+    char input[20];
+    scanf("%s",input);
+    File *fp;
+    struct basic_details acc;
+    fp = fopen("acc.dat","rb");
+    while(fread(&acc,sizeof(acc),1,fp))
+    {
+        if(!strcmp(acc.userID,input))
+        {
+            printf("UserID: %s \n",acc.userID);
+            printf("Name: %s \n",acc.name);
+            printf("Phone number: %ld \n",acc.name);
+            printf("Residence: %s \n",acc.residence);
+        }
+    }
+    getch();
+}
+
+void show_all_buyers()
+{
+    system("cls");
+    printf("ALL QUOTES AND BUYERS \n")
+    FILE *fp;
+    struct buyer_quotes quote;
+    fp = fopen("quotes.dat","rb");
+    while(fread(&quote,sizeof(quote),1,fp))
+    {
+        if(quote.valid)
+        {
+            display_buyer(quote);
+        }
+    }
+    getch();
 }
 
 void buyer_portal()
