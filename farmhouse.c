@@ -7,9 +7,10 @@ Team Members:
     2. Pranshu Shukla, 191ME260, 7385925943, pranshushukla.191me260@nitk.edu.in
 */
 
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 
 //---------------- STRUCTURE DECLARATION--------------
@@ -58,18 +59,17 @@ struct buyer_details main_buyer; //For Storing details of active user if Buyer
 //------------------FUNCTIONS DECLARATION--------------------------
 void create_farmer_details(); //Function to create farmer object for new acc
 void create_buyer_details(); //Function to create farmer object for new acc
-void display_current();
-void farmer_portal();
-void search_buyer();
+void farmer_portal(); //Farmer Portal containing all features for farmer account
+void search_buyer(); //Search By ID
 void buyer_portal(); //Buyers Portal containing all features for buyer account
-void find_by_location();
+void find_by_location(); //Find Closest Buyers
 void add_quote(); //Adding quote to a buyer
-void display_buyer( struct buyer_quotes quotes);
+void display_buyer( struct buyer_quotes quotes); //Displaying Quotes
 void remove_quote(); //Remove Existing Quote from Visibility
-void show_all_buyers();
+void show_all_buyers(); //Show all visible Quotes
 void all_quotes(); //Showing all Quotes of the buyer (Quote History)
 int check_valid_userID(char check[20]);//Function to check if given userID is unique or not during registeration process
-void find_by_price();
+void find_by_price(); //Finding best quote price for a crop
 void SignIn(); //Log In into existing account
 void SignUp(); //Function to Create new users
 
@@ -349,6 +349,7 @@ void create_farmer_details()
     printf("\t\t\t\t\t Enter crop grown: ");
     strcpy(main_farmer.name,main_acc.name);
     strcpy(main_farmer.residence,main_acc.residence);
+    strcpy(main_farmer.userID,main_acc.userID);
     gets(main_farmer.crop);
     FILE *fp;
     fp = fopen("farmer_details.dat","ab"); //write account details farmer file
@@ -362,33 +363,12 @@ void create_buyer_details()
 {
     strcpy(main_buyer.name, main_acc.name);
     strcpy(main_buyer.residence,main_acc.residence);
+    strcpy(main_buyer.userID,main_acc.userID);
     main_buyer.no_of_quotes=0;
     FILE *fp;
     fp = fopen("buyer_details.dat","ab"); //write into buyers file
     fwrite(&main_buyer,sizeof(main_buyer),1,fp);
     fclose(fp);
-}
-
-
-//CHECK / REMOVE
-void display_current()
-{
-    printf("Name: %s \n",main_acc.name);
-    printf("Phone number: %ld \n",main_acc.phno);
-    printf("Residence: %s \n", main_acc.residence);
-    printf("USER ID: %s \n",main_acc.userID);
-    printf("Password: %s \n",main_acc.password);
-    if(main_acc.option == 0)
-    {
-        printf("FARMER DETAILS \n");
-        printf("Crop: %s \n", main_farmer.crop);
-        printf("Residence: %s \n", main_farmer.residence);
-    }
-    if(main_acc.option==1)
-    {
-        printf("BUYER DETAILS \n");
-        printf("Name: %s \n",main_buyer.name);
-    }
 }
 
 
@@ -411,81 +391,115 @@ int check_valid_userID(char check[20]) //Takes char as input while it loops thro
     return valid; //returns valid
 }
 
+
+//----------------------------- Farmer Portal -----------------------------------
 void farmer_portal()
 {
     int selection;
-    while(selection!=7)
+    char ch = 'b'; // to prevent miss direction to wrong menu
+    while(ch!='e')
     {
         system("cls");
-        printf("FARMER PORTAL \n");
-        printf("Select Option: \n");
-        printf("1. Find best buyer based on price \n");
-        printf("2. Find nearest local buyer \n");
-        printf("3. Search buyer by userID \n");
-        printf("4. Show all quotes \n");
-        printf("5. Statistics \n");
-        printf("6. Change my details \n");
-        printf("7. Back");
-        scanf("%d", &selection);
-        switch(selection)
+        printf("\n\n\n\n");
+        printf("\t\t\t\t\t\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 PROJECT FARMHOUSE \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\n");
+        printf("\t\t\t\t\t\t    Mini Project\n");
+        printf("\t\t -----------------------------------------------------------------------------------------\n");
+        printf("\t\t\t\t\t      Farmer Portal\n");
+        printf("\t\t -----------------------------------------------------------------------------------------\n");
+        printf("\n\n");
+        printf("\t\t\t\t Welcome %s, Select An option: \n",main_acc.name);
+        printf("\t\t\t\t\t >Press P to find best quote based on price \n");
+        printf("\t\t\t\t\t >Press N to find best buyer based on residence \n");
+        printf("\t\t\t\t\t >Press S to search for Buyer based on UserID \n");
+        printf("\t\t\t\t\t >Press A to display all visible quotes \n");
+        printf("\t\t\t\t\t >Press E to log out \n");
+        ch = getch();
+        ch = tolower(ch);
+        switch(ch)
         {
-            case 1: find_by_price();
+            case 112: find_by_price(); //to find by price
             break;
 
-            case 2: find_by_location();
+            case 110: find_by_location(); //find by residence
             break;
 
-            case 3: search_buyer();
+            case 115: search_buyer(); //search buyer
             break;
 
-            case 4: show_all_buyers();
+            case 97: show_all_buyers(); //show all buyers
             break;
 
+            case 101: main_acc.option = -1; // log out
+            break;
 
-            default: printf("Enter Valid Option. \nPress any key to continue...");
+            default: printf("\n\n\t\t\t\t\t *Enter Valid Option.* \n");
+            printf("\t\t\t\t\tPress any key to continue...");
             getch();
         }
     }
 }
 
+
+//----------------------------- Finding best quote price for a crop -----------------------------------
 void find_by_price()
 {
+    system("cls");
+    printf("\n\n\n\n");
+    printf("\t\t\t\t\t\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 PROJECT FARMHOUSE \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\n");
+    printf("\t\t\t\t\t\t    Mini Project\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\t\t\t\t\t      Find Best Quote by Price\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\n\n");
     int price = 0;
     FILE *fp;
     fp = fopen("quotes.dat","rb");
     struct buyer_quotes quote;
-
-    system("cls");
-    printf("Enter Crop: ");
+    printf("\t\t\t\t Enter Crop to be sold: ");
 
     char input[20];
-    scanf("%s",input);
+    gets(input);
+    int found = 0;
 
-    while(fread(&quote,sizeof(quote),1,fp))
+    while(fread(&quote,sizeof(quote),1,fp)) //Finding highest quote value for the input crop
     {
-        if(quote.price>=price && quote.valid && !strcmp(quote.crop,input))
+        if(quote.price>=price && quote.valid && !strcmpi(quote.crop,input))
         {
+            found = 1; //Crop with given details found
             price = quote.price;
         }
     }
-    fseek(fp,0,SEEK_SET);
+    printf("\n\n");
+    fseek(fp,0,SEEK_SET);//setting pointer to beginning of file to read contents again
 
-
-    system("cls");
-    printf("BEST BUYER(S) BASED ON QUOTES: \n");
-    while(fread(&quote,sizeof(quote),1,fp))
+    if(found)
     {
-        if(quote.price==price && quote.valid && !strcmp(quote.crop,input))
+        printf("\t\t\t\t Results found for search: \n",found);
+        printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
+        printf("|\t  Name    \t|\tPhone Number\t|     Residence Area \t| Quote Number \t|\tCrop \t|     Quote\t|\n");
+        printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
+        while(fread(&quote,sizeof(quote),1,fp))
         {
-            display_buyer(quote);
+            if(quote.price==price && quote.valid && !strcmp(quote.crop,input))
+            {
+                display_buyer(quote);
+                printf("\n");
+            }
         }
     }
-    printf("Press any key to continue...");
-    getch();
+    else
+    {
+        printf("\t\t\t\t No results found for given search. \n");
+    }
+
     fclose(fp);
+    printf("\t\t\t\t Press any key to continue...");
+    getch();
 }
 
-void display_buyer(struct buyer_quotes quotes)
+
+//----------------------------- Displaying Quotes -----------------------------------
+void display_buyer(struct buyer_quotes quotes) //Displays structure data of quotes
 {
     FILE *fp_buyer, *fp_main;
     fp_main = fopen("acc.dat","rb");
@@ -494,83 +508,160 @@ void display_buyer(struct buyer_quotes quotes)
 
     while(fread(&acc,sizeof(acc),1,fp_main))
     {
-        if(!strcmp(acc.userID,quotes.userID))
+        if(!strcmp(acc.userID,quotes.userID)) //opens corresponding structure object of quote
         {
-            printf("NAME: %s \n",acc.name);
-            printf("Phone number: %ld \n",acc.password);
-            printf("Residence Area: %s \n",acc.residence);
-            printf("Quote number: %d \n",quotes.quote_no);
-            printf("Crop: %s \n",quotes.crop);
-            printf("Quote: %f \n",quotes.price);
-            printf("\n \n");
+            printf("|\t%s    \t|\t %ld \t|\t   %s   \t|\t %d \t|\t %s \t| %0.2f Rs/kg\t|\n",acc.name,acc.phno,acc.residence,quotes.quote_no,quotes.crop,quotes.price);
         }
     }
     fclose(fp_main);
     fclose(fp_buyer);
 }
 
+
+//----------------------------- Find Closest Buyers -----------------------------------
 void find_by_location()
 {
+    system("cls");
+    printf("\n\n\n\n");
+    printf("\t\t\t\t\t\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 PROJECT FARMHOUSE \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\n");
+    printf("\t\t\t\t\t\t    Mini Project\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\t\t\t\t\t      Find Best Quote by Residence\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\n\n");
     FILE *fp;
     fp = fopen("quotes.dat","rb");
-    system("cls");
-    printf("Enter Residence region: ");
+    printf("\t\t\t\t Enter Residence region: ");
     char input[20];
-    scanf("%s",input);
-
-    printf("Enter Crop: ");
-    char input2[20];
-    scanf("%s",input2);
+    gets(input);
 
     struct buyer_quotes quote;
-    system("cls");
-    printf("BEST BUYER BASED ON SEARCH RESULTS: ");
+
+    printf("\t\t\t\t Results found for search: \n");
+    printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
+    printf("|\t  Name    \t|\tPhone Number\t|     Residence Area \t| Quote Number \t|\tCrop \t|     Quote\t|\n");
+    printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
+    int found = 0;
     while(fread(&quote,sizeof(quote),1,fp))
     {
-        if(!strcmp(quote.crop,input2) && !strcmp(quote.residence,input))
+        if(!strcmpi(quote.residence,input) && quote.valid)
         {
+            found++;
             display_buyer(quote);
         }
     }
+
+    if(found)
+    {
+        printf("\t\t\t\t %d Results found\n",found);
+    }
+    else{
+        printf("\t\t\t\t No results found\n");
+    }
+    fclose(fp);
+    printf("\t\t\t\t\t Press any Key to continue...\n");
     getch();
 }
 
+
+//----------------------------- Search By ID -----------------------------------
 void search_buyer()
 {
     system("cls");
-    printf("Enter USERID: ");
+    printf("\n\n\n\n");
+    printf("\t\t\t\t\t\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 PROJECT FARMHOUSE \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\n");
+    printf("\t\t\t\t\t\t    Mini Project\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\t\t\t\t\t      Search for a Buyer by USERID\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\n\n");
+    printf("\t\t\t\t\t Enter USERID of Buyer: ");
     char input[20];
-    scanf("%s",input);
+    gets(input);
     FILE *fp;
+    int found = 0;
     struct basic_details acc;
     fp = fopen("acc.dat","rb");
+    FILE *fp2;
+    fp2 = fopen("buyer_details.dat","rb");
+    struct buyer_details buyer_acc;
+    printf("\n\n");
+    int is_buyer=0;
+    while(fread(&buyer_acc,sizeof(buyer_acc),1,fp2))
+    {
+        if(!strcmp(buyer_acc.userID,input))
+        {
+            is_buyer = 1; //to prevent a farmer ID to be shown
+            break; //userID found
+        }
+
+    }
     while(fread(&acc,sizeof(acc),1,fp))
     {
-        if(!strcmp(acc.userID,input))
+        if(!strcmp(acc.userID,input) && is_buyer) //userID found, Display
         {
-            printf("UserID: %s \n",acc.userID);
-            printf("Name: %s \n",acc.name);
-            printf("Phone number: %ld \n",acc.name);
-            printf("Residence: %s \n",acc.residence);
+            found = 1;
+            printf("\t\t\t\t\t\t > USERID FOUND \n");
+            printf("\t\t\t\t\t\t   \xB2UserID: %s \n",acc.userID);
+            printf("\t\t\t\t\t\t   \xB2Name: %s \n",acc.name);
+            printf("\t\t\t\t\t\t   \xB2Phone number: %ld \n",acc.phno);
+            printf("\t\t\t\t\t\t   \xB2Residence: %s \n",acc.residence);
+            printf("\t\t\t\t\t\t   \xB2No. of Quotes Issued: %d \n",buyer_acc.no_of_quotes);
+            break;
         }
     }
+
+    if(!found)
+    {
+        printf("\t\t\t\t\t *UserID Not Found* \n");
+    }
+
+    printf("\t\t\t\t\t Press any key to continue... \n");
+    fclose(fp);
+    fclose(fp2);
     getch();
 }
 
+
+//----------------------------- Show All Buyers -----------------------------------
 void show_all_buyers()
 {
     system("cls");
-    printf("ALL QUOTES AND BUYERS \n");
+    printf("\n\n\n\n");
+    printf("\t\t\t\t\t\xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2 PROJECT FARMHOUSE \xB2\xB2\xB2\xB2\xB2\xB2\xB2\xB2\n");
+    printf("\t\t\t\t\t\t    Mini Project\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\t\t\t\t\t      All Quotes\n");
+    printf("\t\t -----------------------------------------------------------------------------------------\n");
+    printf("\n\n");
+    printf("\t\t\t\t\t All accessible Quotes: \n");
+    printf("\n");
+    printf("\t\t\t\t Results found for search: \n");
+    printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
+    printf("|\t  Name    \t|\tPhone Number\t|     Residence Area \t| Quote Number \t|\tCrop \t|     Quote\t|\n");
+    printf(" ---------------------------------------------------------------------------------------------------------------------- \n");
     FILE *fp;
+    int found = 0;
     struct buyer_quotes quote;
     fp = fopen("quotes.dat","rb");
     while(fread(&quote,sizeof(quote),1,fp))
     {
         if(quote.valid)
         {
+            found++;
             display_buyer(quote);
         }
     }
+    if(found)
+    {
+        printf("\t\t\t\t %d Results found \n",found);
+    }
+    else
+    {
+        printf("\t\t\t\t No results found \n");
+    }
+    fclose(fp);
+    printf("\t\t\t\t Press any key to continue...\n");
     getch();
 }
 
@@ -593,7 +684,6 @@ void buyer_portal()
         printf("\t\t\t\t\t >Press A to Add quote \n");
         printf("\t\t\t\t\t >Press R to Remove Quote \n");
         printf("\t\t\t\t\t >Press H for Quote history of all quote raised to date \n");
-        printf("\t\t\t\t\t >Press D to Display profile \n");
         printf("\t\t\t\t\t >Press E to log out \n");
         ch = getch();
         ch = tolower(ch);
